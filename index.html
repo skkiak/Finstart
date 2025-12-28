@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinStart — Академия Финансовой Грамотности</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <div id="toast-container" style="position: fixed; top: 20px; right: 20px; z-index: 9999;"></div>
+
+    <div id="screen-landing">
+        <header class="navbar">
+            <div class="logo"><i class="ph-fill ph-planet"></i> FinStart</div>
+            <button class="btn-primary" onclick="showAuth()">Войти</button>
+        </header>
+        <section class="hero">
+            <div class="hero-text">
+                <h1>Твой путь к <br><span class="text-gradient">финансовой свободе</span></h1>
+                <p>19 подробных уроков и облачное сохранение прогресса. Начни строить свое будущее уже сегодня.</p>
+                <button class="btn-primary" onclick="showAuth()">Создать аккаунт</button>
+            </div>
+            <div class="hero-viz">
+                <img src="photo1.webp" style="width: 80%; position: relative; left: 100px; border-radius: 40px; box-shadow: 30px 30px 60px rgba(0,0,0,0.1);" alt="Finance">
+            </div>
+        </section>
+    </div>
+
+    <div id="modal-auth" class="hidden" style="position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); z-index: 1000; display: flex; align-items: center; justify-content: center;">
+        <div class="card" style="width: 400px; text-align: center; padding: 3rem;">
+            <div id="auth-reg-section">
+                <h2 style="margin-bottom: 10px;">Регистрация 🚀</h2>
+                <input type="text" id="reg-name" class="auth-input" placeholder="Твое имя">
+                <input type="email" id="reg-email" class="auth-input" placeholder="Email">
+                <input type="password" id="reg-pass" class="auth-input" placeholder="Пароль">
+                <button class="btn-primary" style="width: 100%;" onclick="handleRegister()">Создать профиль</button>
+                <span class="auth-toggle" onclick="toggleAuth(false)">Уже есть аккаунт? Войти</span>
+            </div>
+            <div id="auth-login-section" class="hidden">
+                <h2 style="margin-bottom: 10px;">Вход 👋</h2>
+                <input type="email" id="login-email" class="auth-input" placeholder="Email">
+                <input type="password" id="login-pass" class="auth-input" placeholder="Пароль">
+                <button class="btn-primary" style="width: 100%;" onclick="handleLogin()">Войти</button>
+                <span class="auth-toggle" onclick="toggleAuth(true)">Нет аккаунта? Регистрация</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="screen-app" class="app-layout">
+        <aside class="sidebar">
+            <div class="logo"><i class="ph-fill ph-planet"></i> FinStart</div>
+            <nav class="side-menu">
+                <div class="menu-item active" id="m-dash" onclick="switchTab('dash')"><i class="ph ph-layout"></i> Дашборд</div>
+                <div class="menu-item" id="m-lessons" onclick="switchTab('lessons')"><i class="ph ph-graduation-cap"></i> Уроки</div>
+                <div class="menu-item" id="m-ach" onclick="switchTab('ach')"><i class="ph ph-trophy"></i> Достижения</div>
+                <div class="menu-item" style="color: var(--danger); margin-top: 20px;" onclick="handleLogout()"><i class="ph ph-sign-out"></i> Выход</div>
+            </nav>
+            <div class="user-pill">
+                <img id="u-avatar" src="">
+                <div>
+                    <p id="u-name" style="font-weight: 800; font-size: 0.95rem;">Имя</p>
+                    <p style="font-size: 0.75rem; color: var(--text-muted);">Уровень <span id="u-level">1</span></p>
+                </div>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <section id="tab-dash" class="content-section active">
+                <h1 style="margin-bottom: 1.5rem;">Ваш кабинет</h1>
+                <div class="dashboard-grid">
+                    <div class="card">
+                        <h3>Планировщик бюджета</h3>
+                        <div style="margin-top: 1.5rem;">
+                            <label>ДОХОД <strong></strong>(KGZ)</label>
+                            <input type="number" id="val-income" value="5000" oninput="recalc()" class="auth-input" style="font-weight:700">
+                            <label>РАСХОДЫ (KGZ)</label>
+                            <input type="number" id="val-expense" value="2000" oninput="recalc()" class="auth-input" style="font-weight:700">
+                        </div>
+                    </div>
+                    <div class="card" style="text-align: center;">
+                        <h3>ФинСкор</h3>
+                        <div class="score-circle" id="score-circle">
+                            <span id="score-num" style="font-size: 2.5rem; font-weight: 800;">0</span>
+                        </div>
+                        <p id="score-msg" style="font-weight: 600;"></p>
+                    </div>
+                    <div class="card" style="grid-column: span 2;">
+                        <canvas id="financeChart" height="100"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <section id="tab-lessons" class="content-section">
+                <h1>Академия (19 уроков) 🎓</h1>
+                <div id="lessons-list" style="margin-top: 1.5rem;"></div>
+            </section>
+
+            <section id="tab-lesson-view" class="content-section">
+                <button class="btn-primary" style="padding: 8px 16px; margin-bottom: 1rem;" onclick="switchTab('lessons')">← Назад</button>
+                <div id="lesson-full-content" class="card"></div>
+            </section>
+
+            <section id="tab-ach" class="content-section">
+                <h1>Твои трофеи 🏆</h1>
+                <div class="ach-grid" id="ach-container" style="margin-top: 2rem;"></div>
+            </section>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
